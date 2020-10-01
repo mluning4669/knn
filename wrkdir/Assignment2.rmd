@@ -45,7 +45,7 @@ There are 1835 "?" values in the occupation column therefore the data set is mis
 ```{r}
 inc_table = table(adult_df$income)
 inc_table
-inc_table[[1]]/(inc_table[[1]] + inc_table[[2]])
+round(prop.table(inc_table) * 100, digits = 2)
 ```
 The data is skewed heavily to the <=50k with that class making up 76% of all entries
 
@@ -67,7 +67,6 @@ boxplot(hours.per.week~income)
 ```{r}
 t.test(age~income)
 t.test(fnlwgt~income)
-t.test(education.num~income)
 t.test(education.num~income)
 t.test(capital.gain~income)
 t.test(capital.loss~income)
@@ -111,7 +110,9 @@ chisq.test(native.country_tbl)
 4c.  Based on your data exploration above, decide which attributes you are going to use to predict income.
 Explain your reason for selecting these attributes.
 
+I'm using the following attributes because I have shown that there a statistically significant relationship between them and income: age, education-num, capital-gain, capital-loss, hours-per-week, workclass, marital-status, education, occupation, sex, and native-country
 
+5.
 
 
 
