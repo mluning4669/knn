@@ -112,9 +112,35 @@ Explain your reason for selecting these attributes.
 
 I'm using the following attributes because I have shown that there a statistically significant relationship between them and income: age, education-num, capital-gain, capital-loss, hours-per-week, workclass, marital-status, education, occupation, sex, and native-country
 
-5.
+5. (1 pt) An initial data exploration shows that the missing values in the dataset are denoted by “?” not
+NA. Change all the “?” characters in the dataframe to NA
 
+```{r}
+adult_df[adult_df == "?"] <- NA
+```
 
+6. (1pt) Use the command colSums(is.na(<your dataframe>) to get the number of missing values in each
+column of your dataframe. Which columns have missing values?
+
+```{r}
+colSums(is.na(adult_df))
+```
+workclass, occupation and native.country have missing values
+
+7. (3 pt) There are several ways we can deal with missing values. The easiest approach is to remove all the
+rows with missing values. However, if a large number of rows have missing values removing them will
+result in loss of information and may affect the classifier performance. If a large number of rows have
+missing values, then it is typically better to replace missing data with some values. This is called data
+imputation. Several methods for missing data imputation exist. The most naïve method (which we will use
+here) is to replace the missing values with mean of the column (for a numerical column) or mode/majority
+value of the column (for a categorical column). We will use a more advanced data imputation method in a
+later module. For now, replace the missing values in a numerical column with the mean of the column and
+the missing values in a categorical column with the mode/majority of the column. After imputation, use
+colSums(is.na(<your dataframe>) to make sure that your dataframe no longer has missing values
+
+```{r}
+attach(adult_df)
+```
 
 
 
