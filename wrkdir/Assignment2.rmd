@@ -139,10 +139,21 @@ the missing values in a categorical column with the mode/majority of the column.
 colSums(is.na(<your dataframe>) to make sure that your dataframe no longer has missing values
 
 ```{r}
-attach(adult_df)
+Mode <- function(x) {
+  ux <- unique(x)
+  ux[which.max(tabulate(match(x, ux)))]
+}
+```
+```{r}
+adult_df$workclass[is.na(adult_df$workclass)] = Mode(adult_df$workclass)
+adult_df$occupation[is.na(adult_df$occupation)] = Mode(adult_df$occupation)
+adult_df$native.country[is.na(adult_df$native.country)] = Mode(adult_df$native.country)
+```
+```{r}
+colSums(is.na(adult_df))
 ```
 
-
+8. (2 pt) This dataset has several categorical variables. With the exception of few models ( such as Naiive Bayes and tree-based models) most machine learning models require numeric features and cannot work directly with categorical data. One way to deal with categorical variables is to assign numeric indices to each level. However, this imposes an artificial ordering on an unordered categorical variable. For example, suppose that we have a categorical variable primary color with three levels: “red”,”blue”,”green”. If we convert “red” to 0 , “blue” to 1 and “green” to 2 then we are telling our model that red < blue< green which is not correct. A better way to encode an unordered categorical variable is to do one-hot-encoding. In one hot-encoding we create a dummy binary variable for each level of a categorical variable. For example we can represent the primary color variable by three binary dummy variables, one for each color (red, blue, and green) . If the color is red, then the variable red takes value 1 while blue and green both take the value zero.
 
 
 
