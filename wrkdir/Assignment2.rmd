@@ -155,12 +155,34 @@ colSums(is.na(adult_df))
 
 8. (2 pt) This dataset has several categorical variables. With the exception of few models ( such as Naiive Bayes and tree-based models) most machine learning models require numeric features and cannot work directly with categorical data. One way to deal with categorical variables is to assign numeric indices to each level. However, this imposes an artificial ordering on an unordered categorical variable. For example, suppose that we have a categorical variable primary color with three levels: “red”,”blue”,”green”. If we convert “red” to 0 , “blue” to 1 and “green” to 2 then we are telling our model that red < blue< green which is not correct. A better way to encode an unordered categorical variable is to do one-hot-encoding. In one hot-encoding we create a dummy binary variable for each level of a categorical variable. For example we can represent the primary color variable by three binary dummy variables, one for each color (red, blue, and green) . If the color is red, then the variable red takes value 1 while blue and green both take the value zero.
 
+Do one-hot-encoding of all your unordered categorical variables (except the income variable). You can use the function one_hot from mltools package to one-hot encode all categorical variables in a dataset. Please refer to https://rdrr.io/cran/mltools/man/one_hot.html . Use option DropUnusedLevels=True to avoid creating a binary variable for unused levels of a factor variable.
+
+Please note that the one_hot function takes a data table not a dataframe. You can convert a dataframe to datatable by using as.data.table method https://www.rdocumentation.org/packages/data.table/versions/1.12.8/topics/as.data.table. Make sure to use library(data.table) before using as.data.table method. You can covert a datatable back to a dataframe by using as.data.frame method https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/as.data.frame
+
+```{r}
+install.packages("mltools")
+library(mltools)
+library(data.table)
+```
+
+```{r}
+encoded_table = one_hot(data.table(adult_df[,-which(names(adult_df) == "income")]), dropUnusedLevels = TRUE)
+encoded_df = as.data.frame(encoded_table)
+encoded_df$income = adult_df$income
+names(encoded_df)
+```
+
+9. Set the seed of the random number generator to a fixed integer, say 1, so that I can reproduce your work:
+```{r}
+set.seed(1)
+```
 
 
+10. (1 pt) Scale all numeric features using Min-Max scaling
 
-
-
-
+```{r}
+norm_df = normalize()
+```
 
 
 
