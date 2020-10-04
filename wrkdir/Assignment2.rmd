@@ -181,9 +181,17 @@ set.seed(1)
 10. (1 pt) Scale all numeric features using Min-Max scaling
 
 ```{r}
-norm_df = normalize()
+normalize = function(col){
+    (col - min(col))/(max(col) - min(col))
+}
+normalized_df = as.data.frame(sapply(encoded_df[-(length(encoded_df))], normalize))
 ```
 
+11. (1pt) Randomize the order of the rows in the dataset.
+
+```{r}
+
+```
 
 
 
