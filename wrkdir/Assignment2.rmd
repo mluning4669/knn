@@ -228,28 +228,66 @@ crossValidationError=function(features,target,k,k_cross){
 ```
 
 ```{r}
-k = floor(sqrt(nrow(normalized_df)*0.8))
+cf_error_180 = crossValidationError(normalized_df,encoded_df$income, k = 180, k_cross=5) #sqrt of the nrow of normalized_df = 180
 ```
 
 ```{r}
-cf_error = crossValidationError(normalized_df,encoded_df$income, k = k, k_cross=5)
+mean(cf_error_180)
+```
+
+13. (2 pts) Tune K (the number of nearest neighbors) by trying out different values (starting from k=1 to
+k=sqrt(n) where n is the number of observations in the dataset (for example k=1,5,10,20 50,100, sqrt(n) ).
+Draw a plot of cross validation errors for different values of K. Which value of K seems to perform the best
+on this data set? (You can find an example in slides 54-55 of module 4 lecture notes) Note: This might a
+long time to run on your machine, be patient ( It took about 30 minutes on my machine to run 5-fold cross
+validation for 6 different K values)
+
+```{r}
+#k = 90
+cf_error_90 = crossValidationError(normalized_df,encoded_df$income, k = 90, k_cross=5)
+mean(cf_error_90)
+```
+```{r}
+#k = 45
+cf_error_45 = crossValidationError(normalized_df,encoded_df$income, k = 45, k_cross=5)
+mean(cf_error_45)
 ```
 
 ```{r}
-mean(cf_error)
+#k = 22
+cf_error_22 = crossValidationError(normalized_df,encoded_df$income, k = 22, k_cross=5)
+mean(cf_error_22)
+```
+
+```{r}
+#k = 11
+cf_error_11 = crossValidationError(normalized_df,encoded_df$income, k = 11, k_cross=5)
+mean(cf_error_11)
+```
+
+```{r}
+#k = 5
+cf_error_5 = crossValidationError(normalized_df,encoded_df$income, k = 5, k_cross=5)
+mean(cf_error_5)
+```
+
+```{r}
+#k = 2
+cf_error_2 = crossValidationError(normalized_df,encoded_df$income, k = 2, k_cross=5)
+mean(cf_error_2)
 ```
 
 
-
-
-
-
-
-
-
-
-
-
+```{r}
+#k = 1
+cf_error_1 = crossValidationError(normalized_df,encoded_df$income, k = 1, k_cross=5)
+mean(cf_error_1)
+```
+```{r}
+error = c(mean(cf_error_1), mean(cf_error_2), mean(cf_error_5), mean(cf_error_11), mean(cf_error_22), mean(cf_error_45), mean(cf_error_90), mean(cf_error_180))
+kvals = c(1, 2, 5, 11, 22, 45, 90, 180)
+plot(kvals, error)
+```
 
 
 
