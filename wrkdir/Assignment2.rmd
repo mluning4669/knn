@@ -74,6 +74,11 @@ t.test(hours.per.week~income)
 ```
 
 For the numerical features it would appear that there is a relationship between income and the following: age, education-num, capitol-gain, capitol-loss, and hours-per-week
+```{r}
+adult_df_old = adult_df
+adult_df = adult_df[-3]
+```
+
 
 4b. To explore the relationship between categorical features and “income” variable, you can use frequency table and chisquare test (note that chisquare test might throw a warning if there are cells whose expected counts in the frequency table is less 5. This warning means the p-values reported from chisquare test may be incorrect due to low counts and are not reliable. You can ignore the warning for this assignment).
 
@@ -104,13 +109,13 @@ chisq.test(sex_tbl)
 
 native.country_tbl = table(native.country, income)
 native.country_tbl
-chisq.test(native.country_tbl)
+chisq.test(native.country_tbl[-1]) #to remove "?" from the factor since it breaks the chi-squared test
 ```
 
 4c.  Based on your data exploration above, decide which attributes you are going to use to predict income.
 Explain your reason for selecting these attributes.
 
-I'm using the following attributes because I have shown that there a statistically significant relationship between them and income: age, education-num, capital-gain, capital-loss, hours-per-week, workclass, marital-status, education, occupation, sex, and native-country
+I'm using the following attributes because I have shown that there is a statistically significant relationship between them and income: relationship, workclass, marital-status, education, occupation, sex, native-country, age, education-num, capitol-gain, capitol-loss, and hours-per-week
 
 5. (1 pt) An initial data exploration shows that the missing values in the dataset are denoted by “?” not
 NA. Change all the “?” characters in the dataframe to NA
@@ -160,7 +165,7 @@ Do one-hot-encoding of all your unordered categorical variables (except the inco
 Please note that the one_hot function takes a data table not a dataframe. You can convert a dataframe to datatable by using as.data.table method https://www.rdocumentation.org/packages/data.table/versions/1.12.8/topics/as.data.table. Make sure to use library(data.table) before using as.data.table method. You can covert a datatable back to a dataframe by using as.data.frame method https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/as.data.frame
 
 ```{r}
-install.packages("mltools")
+#install.packages("mltools")
 library(mltools)
 library(data.table)
 ```
@@ -190,11 +195,49 @@ normalized_df = as.data.frame(sapply(encoded_df[-(length(encoded_df))], normaliz
 11. (1pt) Randomize the order of the rows in the dataset.
 
 ```{r}
-
+encoded_df = encoded_df[sample(nrow(encoded_df),replace = FALSE),]
+normalized_df = as.data.frame(sapply(encoded_df[-(length(encoded_df))], normalize))
 ```
 
+12. (4 pts) Use 5-fold cross validation with KNN to predict the “income” variable and report the cross-
+validation error. ( You can find an example in slides 51-53 of module 4 lecture notes).
 
+```{r}
+library(lattice)
+library(ggplot2)
+library(caret)
+library(class)
+```
 
+```{r}
+knn_fold=function(features,target,fold,k){
+  train=features[-fold,]
+  validation=features[fold,]
+  train_labels=target[-fold]
+  validation_labels=target[fold]
+  validation_preds=knn(train,validation,train_labels,k=k)
+  t= table(validation_labels,validation_preds)
+  error=(t[1,2]+t[2,1])/(t[1,1]+t[1,2]+t[2,1]+t[2,2])
+  return(error)
+}
+
+crossValidationError=function(features,target,k,k_cross){
+  folds=createFolds(target,k=k_cross)
+  errors=sapply(folds,knn_fold,features=features, target=target,k=k)
+}
+```
+
+```{r}
+k = floor(sqrt(nrow(normalized_df)*0.8))
+```
+
+```{r}
+cf_error = crossValidationError(normalized_df,encoded_df$income, k = k, k_cross=5)
+```
+
+```{r}
+mean(cf_error)
+```
 
 
 
