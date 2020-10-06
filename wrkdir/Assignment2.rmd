@@ -289,8 +289,54 @@ kvals = c(1, 2, 5, 11, 22, 45, 90, 180)
 plot(kvals, error)
 ```
 
+14. (3 pt) Use 5-fold cross validation with KNN to predict the income variable and report the average false
+positive rate (FPR) and false negative rate (FNR) of the classifier. . FPR is the proportion of negative
+instances classified as positive by the classifier. Similarly, FNR is the proportion of positive instances
+classified as negative by the classifier.
 
+It does not matter which class you designate as positive or negative. For instance, you can designate
+income>50K as positive and income<50K as negative
+Note : don’t need to tune K again, you can use the best K you found in the previous question.
+Note: you can find an example of computing false negative rate and false positive rate for each fold in module
+5 lecture notes slides 56-59. These slides use a naiive bayes classifier for prediction but you can modify it to
+use knn and report the average FPR and FNR
 
+```{r}
+knn_fold = function(features,target,fold,k){
+  train=features[-fold,]
+  validation=features[fold,]
+  train_labels=target[-fold]
+  validation_labels=target[fold]
+  validation_preds=knn(train,validation,train_labels,k=k)
+  t= table(validation_labels,validation_preds)
+  FPR=t[1,2]/(t[1,2]+t[1,1])
+  FNR=t[2,1]/(t[2,1]+t[2,2])
+  return (c("FPR"=FPR,"FNR"=FNR))
+}
+
+crossValidatonError=function(features,target,k,k_cross){
+  folds=createFolds(target,k=k_cross)
+  errors=sapply(folds,knn_kfold,features=features, target=target,k=k)
+}
+
+errors = crossValidationError(normalized_df,encoded_df$income, k = 22, k_cross=5)
+
+rowMeans(errors)
+```
+
+15. (2 pt) Consider a majority classifier which always predicts income <50K. Without writing any code, explain
+what would be the training error of this classifier? ( Note the training error of this majority classifier is simply the
+proportion of all examples with income>50K because they are all misclassified by this majority classifier).
+Compare this with the cross validation error of KNN you computed in question 8. Does KNN do better than this
+majority classifier?
+
+The training error would be 7841/32561 = 0.2408 = 24.08%
+the lowest training error with knn is 0.166119 = 16.6% which means knn does better than majority classifier 
+
+16. (2 pt) Explain what is the False Positive Rate and False Negative Rate of the majority classifier and how
+does it compare to the average FPR and FNR of KNN classifier you computed in question 10. You don’t
+need to write any code to compute FPR and FNR of the majority classifier. You can just compute it based
+on the definition of FNR and FPR.
 
 
 
