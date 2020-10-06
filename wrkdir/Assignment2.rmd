@@ -314,7 +314,7 @@ knn_fold = function(features,target,fold,k){
   return (c("FPR"=FPR,"FNR"=FNR))
 }
 
-crossValidatonError=function(features,target,k,k_cross){
+crossValidationError=function(features,target,k,k_cross){
   folds=createFolds(target,k=k_cross)
   errors=sapply(folds,knn_kfold,features=features, target=target,k=k)
 }
@@ -337,6 +337,107 @@ the lowest training error with knn is 0.166119 = 16.6% which means knn does bett
 does it compare to the average FPR and FNR of KNN classifier you computed in question 10. You don’t
 need to write any code to compute FPR and FNR of the majority classifier. You can just compute it based
 on the definition of FNR and FPR.
+
+if income <50k is positive then all negatives (>50k) are misidentified as positives which gives a FPR is 100%
+and therefore no positives are misidentified as false negatives giving a FNR of 0%
+
+Problem 2: Applying Naïve Bayes classifier to predict income
+
+1. Set the seed of the random number generator to a fixed integer, say 1, so that you can
+reproduce your work:
+
+```{r}
+set.seed(1)
+```
+
+2. Based on your data exploration in problem1, decide which features you want to keep to predict the
+income and remove other features.
+
+I'm sticking with the columns used with knn
+
+
+Note: As we learned in the lectures, Naïve Bayes uses frequency tables to compute conditional
+probabilities. Frequency tables are only computed for categorical (or discrete features). For a
+continuous feature, you can either
+1. manually convert it to a categorical variable by binning ( as explained in the lectures), or
+2. pass it directly to naiveBayes() function in R and it will use Gaussian Naïve Bayes to
+compute the conditional probabilities. More specifically, If xx is a continuous feature and yy is
+the target variable ( i.e., the variable we want to predict) with cc 1 , cc 2 , ... , cc kk classes, then the
+Gaussian Naïve Bayes assumes that the likelihood pp(xx|yy = CC ii ) has a Gaussian/normal
+distribution and estimates its mean and variance from the training data. This distribution is
+used (instead of a frequency table) to compute the likelihood for each observed value of xx in
+the data. Fortunately, the naiveBayes function in R does this computation for you. You just
+pass the dataset as is and it will automatically use Gaussian Naïve Bayes to compute
+conditional probabilities for continuous features.
+
+3. (4 pt) Use 5-fold cross validation with Naïve Bayes to predict the “income” variable and report the
+cross-validation error.
+
+```{r}
+#install.packages("e1071")
+library(e1071)
+```
+
+```{r}
+naiveBayes_fold=function(fold,features,target,laplace=0){
+  train=features[-fold,]
+  validation=features[fold,]
+  train_labels=target[-fold]
+  validation_labels=target[fold]
+  NaiveBayes_model=naiveBayes(train,train_labels,laplace=laplace)
+  validation_preds=predict(NaiveBayes_model, validation)
+  t= table(validation_labels,validation_preds)
+  error=(t[1,2]+t[2,1])/(t[1,1]+t[1,2]+t[2,1]+t[2,2])
+  return(error)
+}
+
+crossValidationError=function(features,target,laplace=0,n_folds)
+{
+  folds=createFolds(target,k=n_folds)
+  errors=sapply(folds,naiveBayes_fold,features=features,
+  target=target,laplace=laplace)
+}
+
+cv_error = crossValidationError(adult_df, adult_df$income, n_folds = 5)
+mean(cv_error)
+```
+2.6% error rate
+
+4. (2 pt)Compare the cross validation error of Naiive Bayes with that of KNN. Which one performs better
+on this dataset?
+
+at best I found that knn performs with a 16% error rate, which is significantly worse than the 2.6% error rate for naive bayes
+
+
+5. (2 pt) Compare the False Positive Rate and False Negative Rate of naiive Bayes with those of the
+majority classifier which always predicts income <50K.
+
+```{r}
+naiveBayes_fold=function(fold,features,target,laplace=0){
+  train=features[-fold,]
+  validation=features[fold,]
+  train_labels=target[-fold]
+  validation_labels=target[fold]
+  NaiveBayes_model=naiveBayes(train,train_labels,laplace=laplace)
+  validation_preds=predict(NaiveBayes_model, validation)
+  t= table(validation_labels,validation_preds)
+  FPR=t[1,2]/(t[1,2]+t[1,1])
+  FNR=t[2,1]/(t[2,1]+t[2,2])
+  return (c("FPR"=FPR,"FNR"=FNR))
+}
+
+crossValidationError=function(features,target,laplace=0,n_folds)
+{
+  folds=createFolds(target,k=n_folds)
+  errors=sapply(folds,naiveBayes_fold,features=features,
+  target=target,laplace=laplace)
+  return(rowMeans(errors))
+}
+
+errors = crossValidationError(adult_df, adult_df$income, n_folds = 5)
+errors
+```
+a FPR is 100% for the majority classifier is the worst rate possible so naive bayes wins out in that category. However a respectable 5.2% FNR for naive bayes is not quite as good as the 0% FNR for majority classifier
 
 
 
